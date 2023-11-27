@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>		
+		<PackageId>IllegalClassReferenceAnalyzer</PackageId>
+		<PackageVersion>1.0.0.0</PackageVersion>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Version>1.0.0.0</Version>
+		<Authors>Nick Tziamihas</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>			
+		<RepositoryUrl>https://github.com/AlSavant/IllegalClassReferenceAnalyzer</RepositoryUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<Description>Diagnostics Analyzer that prohibits use of referenced Types in dependency injection.</Description>
+		<PackageReleaseNotes>First push.</PackageReleaseNotes>
+		<PackageTags>analyzers, analyzer</PackageTags>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0" PrivateAssets="all" />
+		<PackageReference Update="NETStandard.Library" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Properties\" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	</ItemGroup>
+</Project>
