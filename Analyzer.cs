@@ -14,7 +14,7 @@ namespace IllegalClassReferenceAnalyzer
     public sealed class Analyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "WOD001";
-        private const string Category = "Design";
+        private const string Category = "Security";
         private static readonly DiagnosticDescriptor rule = new DiagnosticDescriptor(
             DiagnosticId,
             "Illegal Type reference detected",

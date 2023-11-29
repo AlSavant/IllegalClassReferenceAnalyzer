@@ -4,4 +4,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-WOD001  |  Design  |   Error  | WOD001_IllegalClassReferenceAnalyzer
+WOD001  | Security |  Error   | WOD001_IllegalClassReferenceAnalyzer
