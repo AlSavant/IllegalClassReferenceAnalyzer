@@ -1,14 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Xml.Linq;
-using System.Reflection;
-using System.IO;
-using Microsoft.CodeAnalysis.Text;
-using System.Text;
+using IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies;
+using IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies.Implementations;
+using IllegalClassReferenceAnalyzer.Services.Util;
+using System.Linq;
 
 namespace IllegalClassReferenceAnalyzer
 {
@@ -16,85 +14,50 @@ namespace IllegalClassReferenceAnalyzer
     public sealed class Analyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "WOD001";
-        private const string Category = "IllegalInjection";
-
-        private HashSet<string> forbiddenTypeNames = new HashSet<string>();
-
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
+        private const string Category = "Design";
+        private static readonly DiagnosticDescriptor rule = new DiagnosticDescriptor(
             DiagnosticId,
-            "Illegal Injection detected",
-            "Type {0} should not be injected in service for security reasons. Use alternative types provided in internal libraries instead.",
+            "Illegal Type reference detected",
+            "Type {0} should not be referenced for security reasons. Use alternative types provided in internal libraries instead.",
             Category,
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(rule); } }
+        private readonly Dictionary<SyntaxKind, IAnalyzerStrategy> strategies = new Dictionary<SyntaxKind, IAnalyzerStrategy>();
+        private readonly SyntaxKind[] registeredKinds;
+
+        public Analyzer()
+        {
+            strategies.Add(SyntaxKind.ConstructorDeclaration, new ConstructorDeclarationAnalyzerStrategy());
+            strategies.Add(SyntaxKind.VariableDeclaration, new VariableDeclarationAnalyzerStrategy());
+            strategies.Add(SyntaxKind.MethodDeclaration, new MethodDeclarationAnalyzerStrategy());
+            strategies.Add(SyntaxKind.PropertyDeclaration, new PropertyDeclarationAnalyzerStrategy());
+            strategies.Add(SyntaxKind.ClassDeclaration, new ClassDeclarationAnalyzerStrategy());
+            strategies.Add(SyntaxKind.InterfaceDeclaration, new InterfaceDeclarationAnalyzerStrategy());
+
+            registeredKinds = strategies.Keys.ToArray();
+        }
 
         public override void Initialize(AnalysisContext context)
-        {            
+        {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeConstructor, SyntaxKind.ConstructorDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, registeredKinds);                
         }
 
-        private void AnalyzeConstructor(SyntaxNodeAnalysisContext context)
-        {
+        private void AnalyzeNode(SyntaxNodeAnalysisContext context)
+        {               
+            var forbiddenTypeNames = new HashSet<string>();
             foreach(var file in context.Options.AdditionalFiles)
             {
-                ReadSettingsFromXml(file);
+                file.ParseForbiddenTypeNames(forbiddenTypeNames);
             }
-            
-            var constructorDeclaration = (ConstructorDeclarationSyntax)context.Node;
-
-            foreach (var parameter in constructorDeclaration.ParameterList.Parameters)
+            var syntaxKind = context.Node.Kind();
+            if(strategies.ContainsKey(syntaxKind))
             {
-                var parameterType = context.SemanticModel.GetTypeInfo(parameter.Type).Type;
-                               
-                if (IsForbiddenType(parameterType))
-                {
-                    var diagnostic = Diagnostic.Create(Rule, parameter.GetLocation(), parameterType);
-                    context.ReportDiagnostic(diagnostic);
-                }
-            }
-        }        
-
-        private bool IsForbiddenType(ITypeSymbol typeSymbol)
-        {            
-            var typeString = $"{typeSymbol.ContainingNamespace}.{typeSymbol.Name}";
-            return forbiddenTypeNames.Contains(typeString);
-        }       
-
-        private void ReadSettingsFromXml(AdditionalText additionalText)
-        {
-            try
-            {
-                SourceText fileText = additionalText.GetText();
-                MemoryStream stream = new MemoryStream();
-                using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                {
-                    fileText.Write(writer);
-                }
-
-                stream.Position = 0;
-                XDocument doc = XDocument.Load(stream);
-                
-                var rootNode = doc.Element("AnalyzerSettings");
-                var elements = rootNode?.Elements("ForbiddenType");
-                if (elements != null)
-                {
-                    foreach (var element in elements)
-                    {
-                        if (!string.IsNullOrEmpty(element.Value))
-                        {
-                            forbiddenTypeNames.Add(element.Value);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                return;
-            }
-        }
+                strategies[syntaxKind].AnalyzeNode(context, rule, forbiddenTypeNames);
+            }            
+        }                      
     }
 }
