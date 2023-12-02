@@ -8,7 +8,7 @@ namespace IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies.Implementati
 {
     internal sealed class VariableDeclarationAnalyzerStrategy : IAnalyzerStrategy
     {
-        public void AnalyzeNode(SyntaxNodeAnalysisContext context, DiagnosticDescriptor rule, HashSet<string> forbiddenTypeNames)
+        public void AnalyzeNode(SyntaxNodeAnalysisContext context, DiagnosticDescriptor rule, HashSet<string> forbiddenTypeNames, HashSet<string> allowedTypeNames)
         {
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
             if(variableDeclaration.Type == null)
@@ -16,7 +16,7 @@ namespace IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies.Implementati
                 return;
             }
             var variableType = context.SemanticModel.GetTypeInfo(variableDeclaration.Type).Type;
-            if (variableType.IsForbiddenType(forbiddenTypeNames))
+            if (variableType.IsForbiddenType(forbiddenTypeNames, allowedTypeNames))
             {
                 var diagnostic = Diagnostic.Create(rule, variableDeclaration.GetLocation(), variableType);
                 context.ReportDiagnostic(diagnostic);

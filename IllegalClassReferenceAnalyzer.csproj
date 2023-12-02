@@ -6,15 +6,15 @@
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>		
 		<PackageId>IllegalClassReferenceAnalyzer</PackageId>
-		<PackageVersion>1.0.0.2</PackageVersion>
-		<AssemblyVersion>1.0.0.2</AssemblyVersion>
-		<Version>1.0.0.2</Version>
+		<PackageVersion>1.0.0.3</PackageVersion>
+		<AssemblyVersion>1.0.0.3</AssemblyVersion>
+		<Version>1.0.0.3</Version>
 		<Authors>Nick Tziamihas</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>			
 		<RepositoryUrl>https://github.com/AlSavant/IllegalClassReferenceAnalyzer</RepositoryUrl>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<Description>Diagnostics Analyzer that prohibits use of referenced Types in project.</Description>
-		<PackageReleaseNotes>Elevated rule category to Security for markdown purposes.</PackageReleaseNotes>
+		<PackageReleaseNotes>Added support for AllowedType xml nodes.</PackageReleaseNotes>
 		<PackageTags>analyzers, analyzer</PackageTags>
 		<NoPackageAnalysis>true</NoPackageAnalysis>
 		<PackageReadmeFile>README.md</PackageReadmeFile>

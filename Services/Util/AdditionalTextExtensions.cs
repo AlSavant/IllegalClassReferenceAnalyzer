@@ -9,7 +9,7 @@ namespace IllegalClassReferenceAnalyzer.Services.Util
 {
     internal static class AdditionalTextExtensions
     {
-        public static HashSet<string> ParseForbiddenTypeNames(this AdditionalText additionalText, HashSet<string> forbiddenTypeNames)
+        public static void ParseForbiddenTypeNames(this AdditionalText additionalText, HashSet<string> forbiddenTypeNames, HashSet<string> allowedTypeNames)
         {            
             try
             {
@@ -35,9 +35,20 @@ namespace IllegalClassReferenceAnalyzer.Services.Util
                         }
                     }
                 }
+
+                elements = rootNode?.Elements("AllowedType");
+                if (elements != null)
+                {
+                    foreach (var element in elements)
+                    {
+                        if (!string.IsNullOrEmpty(element.Value))
+                        {
+                            allowedTypeNames.Add(element.Value);
+                        }
+                    }
+                }
             }
-            catch { }
-            return forbiddenTypeNames;
+            catch { }            
         }
     }
 }

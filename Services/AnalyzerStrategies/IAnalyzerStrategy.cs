@@ -6,6 +6,6 @@ namespace IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies
 {
     internal interface IAnalyzerStrategy
     {
-        void AnalyzeNode(SyntaxNodeAnalysisContext context, DiagnosticDescriptor rule, HashSet<string> forbiddenTypeNames);
+        void AnalyzeNode(SyntaxNodeAnalysisContext context, DiagnosticDescriptor rule, HashSet<string> forbiddenTypeNames, HashSet<string> allowedTypeNames);
     }
 }

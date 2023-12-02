@@ -21,3 +21,13 @@ AdditionalFile entries should be added to the project's csproj file as such:
 ```
 
 The analyzer will iterate all AdditionalFiles and parse the ones that have the compatible structure above.
+
+In some cases, for multi project solutions, one or more projects may be referencing the same additional file. In cases where some of these projects need to exclude one or more type from the common AdditionalFile, they can have secondary exclusive AdditionalFiles only referenced by these projects, using the AllowedType node:
+
+```
+<?xml version="1.0" encoding="utf-8" ?>
+<AnalyzerSettings>
+	<AllowedType>System.Net.Http.IHttpClientFactory</AllowedType>
+</AnalyzerSettings>
+```
+

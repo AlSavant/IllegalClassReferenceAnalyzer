@@ -49,14 +49,15 @@ namespace IllegalClassReferenceAnalyzer
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {               
             var forbiddenTypeNames = new HashSet<string>();
+            var allowedTypeNames = new HashSet<string>();
             foreach(var file in context.Options.AdditionalFiles)
             {
-                file.ParseForbiddenTypeNames(forbiddenTypeNames);
+                file.ParseForbiddenTypeNames(forbiddenTypeNames, allowedTypeNames);
             }
             var syntaxKind = context.Node.Kind();
             if(strategies.ContainsKey(syntaxKind))
             {
-                strategies[syntaxKind].AnalyzeNode(context, rule, forbiddenTypeNames);
+                strategies[syntaxKind].AnalyzeNode(context, rule, forbiddenTypeNames, allowedTypeNames);
             }            
         }                      
     }

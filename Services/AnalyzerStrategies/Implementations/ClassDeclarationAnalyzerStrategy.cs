@@ -8,7 +8,7 @@ namespace IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies.Implementati
 {
     internal sealed class ClassDeclarationAnalyzerStrategy : IAnalyzerStrategy
     {
-        public void AnalyzeNode(SyntaxNodeAnalysisContext context, DiagnosticDescriptor rule, HashSet<string> forbiddenTypeNames)
+        public void AnalyzeNode(SyntaxNodeAnalysisContext context, DiagnosticDescriptor rule, HashSet<string> forbiddenTypeNames, HashSet<string> allowedTypeNames)
         {
             var classDeclaration = (ClassDeclarationSyntax)context.Node;            
 
@@ -17,7 +17,7 @@ namespace IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies.Implementati
                 foreach (var parameter in classDeclaration.BaseList.Types)
                 {
                     var parameterType = context.SemanticModel.GetTypeInfo(parameter.Type).Type;
-                    if (parameterType.IsForbiddenType(forbiddenTypeNames))
+                    if (parameterType.IsForbiddenType(forbiddenTypeNames, allowedTypeNames))
                     {
                         var diagnostic = Diagnostic.Create(rule, parameter.GetLocation(), parameterType);
                         context.ReportDiagnostic(diagnostic);
@@ -33,7 +33,7 @@ namespace IllegalClassReferenceAnalyzer.Services.AnalyzerStrategies.Implementati
                     foreach(var attribute in attributeList.Attributes)
                     {
                         var attributeType = context.SemanticModel.GetTypeInfo(attribute).Type;
-                        if (attributeType.IsForbiddenType(forbiddenTypeNames))
+                        if (attributeType.IsForbiddenType(forbiddenTypeNames, allowedTypeNames))
                         {
                             var diagnostic = Diagnostic.Create(rule, attribute.GetLocation(), attributeType);
                             context.ReportDiagnostic(diagnostic);
